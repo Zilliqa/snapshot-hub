@@ -9,7 +9,7 @@ export const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 
 // middleware for json body parsing
-app.use(bodyParser.json({limit: '5mb'}));
+app.use(bodyParser.json({limit: '1mb'}));
 
 // enable corse for all origins
 app.use((req, res, next) => {
@@ -21,9 +21,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(router);
+app.use('api', router);
 
 app.use(errorhandler({
   debug: process.env.ENV !== 'prod',
-  log: true,
+  log: true
 }));
