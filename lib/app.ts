@@ -1,6 +1,6 @@
-import * as express from 'express';
+import express from 'express';
 import * as bodyParser from 'body-parser';
-import * as errorhandler from 'strong-error-handler';
+import errorhandler from 'strong-error-handler';
 import router from './routes';
 
 export const app = express();
