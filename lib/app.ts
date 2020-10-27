@@ -1,8 +1,7 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as errorhandler from 'strong-error-handler';
-import {movies} from './routes/movies';
-import {actors} from './routes/actors';
+import router from './routes';
 
 export const app = express();
 
@@ -22,8 +21,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/movies', movies);
-app.use('/actors', actors);
+app.use(router);
 
 app.use(errorhandler({
   debug: process.env.ENV !== 'prod',
