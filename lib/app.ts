@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('api', router);
+app.use('/api', router);
 
 app.use(errorhandler({
   debug: process.env.ENV !== 'prod',

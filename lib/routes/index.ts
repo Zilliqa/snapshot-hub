@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { message } from './message';
 import { spaces } from './spaces';
+import relayer from '../zilliqa/relayer';
 
 import pkg from '../../package.json';
 
@@ -24,7 +25,7 @@ router.get('/', (req, res) => {
     name: pkg.name,
     version: pkg.version,
     tag: 'alpha',
-    // relayer: relayer.address
+    relayer: relayer ? relayer.bech32Address : null
   });
 });
 
