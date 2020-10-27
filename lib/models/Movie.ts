@@ -28,7 +28,7 @@ import {MovieGenre} from './MovieGenre';
   }
 }))
 @Table
-export class Movie extends Model<Movie> {
+export class Movie extends Model {
 
   @Column
   title!: string;

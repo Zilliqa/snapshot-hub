@@ -1,4 +1,12 @@
-import {Model, Column, Table, BelongsToMany, Scopes, CreatedAt, UpdatedAt} from "sequelize-typescript";
+import {
+  Model,
+  Column,
+  Table,
+  BelongsToMany,
+  Scopes,
+  CreatedAt,
+  UpdatedAt
+} from "sequelize-typescript";
 import {Movie} from "./Movie";
 import {MovieActor} from "./MovieActor";
 
