@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { message } from './message';
-import { spaces } from './spaces';
+import { spacesRouter } from './spaces';
 import relayer from '../zilliqa/relayer';
 
 import pkg from '../../package.json';
@@ -17,9 +17,9 @@ if (dev) {
 }
 
 router.use('/message', message);
-router.use('/spaces', spaces);
+router.use(spacesRouter);
 
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
   return res.json({
     network,
     name: pkg.name,

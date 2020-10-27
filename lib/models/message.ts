@@ -4,7 +4,8 @@ import {
   Model,
   CreatedAt,
   UpdatedAt,
-  DataType
+  DataType,
+  Unique
 } from 'sequelize-typescript';
 
 
@@ -27,16 +28,20 @@ export class Message extends Model<Message> {
   sig!: string;
 
   @Column
-  space?: string;
+  space!: string;
 
   @Column
-  token?: string;
+  token!: string;
+
+  @Unique
+  @Column
+  author_ipfs_hash!: string;
 
   @Column(DataType.JSON)
-  payload?: string;
+  payload!: string;
 
   @Column(DataType.JSON)
-  metadata?: string;
+  metadata!: string;
 
   @CreatedAt
   @Column

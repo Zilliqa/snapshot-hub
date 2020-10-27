@@ -1,35 +1,78 @@
 import { Router } from 'express';
+import fromentries from 'object.fromentries';
+import spaces from '@snapshot-labs/snapshot-spaces';
+import { Message } from '../models';
 
-export const spaces = Router();
+export const spacesRouter = Router();
 
-spaces.post('/spaces', async (req, res, next) => {
-  try {
-    res.status(201).json({});
-  } catch (e) {
-    next(e);
-  }
-});
-
-spaces.get('/spaces/:key?', (req, res) => {
+spacesRouter.get('/spaces/:key?', (req, res) => {
   const { key } = req.params;
-  return res.status(201).json({
-    key
-  });
+
+  return res
+    .status(201)
+    .json(key ? spaces[key] : spaces);
 });
 
-spaces.get('/:space/proposals', async (req, res) => {
+spacesRouter.get('/:space/proposals', async (req, res) => {
   const { space } = req.params;
-
-  return res.status(201).json({
-    space
+  const messages = await Message.findAll({
+    where: {
+      space,
+      type: 'proposal'
+    },
+    order: [
+      ['timestamp', 'DESC']
+    ],
   });
+  const spaces = messages.map(message => {
+    const metadata = JSON.parse(message.metadata);
+
+    return [message.id, {
+      address: message.address,
+      msg: {
+        version: message.version,
+        timestamp: String(message.timestamp),
+        token: message.token,
+        type: message.type,
+        payload: JSON.parse(message.payload)
+      },
+      sig: message.sig,
+      authorIpfsHash: message.author_ipfs_hash,
+      relayerIpfsHash: metadata.relayer_ipfs_hash
+    }];
+  })
+
+  return res.status(201).json(fromentries(spaces));
 });
 
-spaces.get('/:space/proposal/:id', async (req, res) => {
+spacesRouter.get('/:space/proposal/:id', async (req, res) => {
   const { space, id } = req.params;
-
-  return res.status(201).json({
-    space,
-    id
+  const messages = await Message.findAll({
+    where: {
+      space,
+      author_ipfs_hash: id,
+      type: 'vote'
+    },
+    order: [
+      ['timestamp', 'DESC']
+    ],
   });
+  const spaces = messages.map(message => {
+    const metadata = JSON.parse(message.metadata);
+    return [message.address, {
+      address: message.address,
+      msg: {
+        version: message.version,
+        timestamp: message.timestamp.toString(),
+        token: message.token,
+        type: message.type,
+        payload: JSON.parse(message.payload)
+      },
+      sig: message.sig,
+      authorIpfsHash: message.author_ipfs_hash,
+      relayerIpfsHash: metadata.relayer_ipfs_hash
+    }];
+  })
+
+  return res.status(201).json(fromentries(spaces));
 });
