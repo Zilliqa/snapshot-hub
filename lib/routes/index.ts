@@ -16,7 +16,7 @@ if (dev) {
   network = 'testnet';
 }
 
-router.use('/message', message);
+router.use(message);
 router.use(spacesRouter);
 
 router.get('/', (_, res) => {
