@@ -1,6 +1,6 @@
 {
   "name": "snapshot-hub",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "description": "snapshot-hub is rest API for snapshot frontend",
   "main": "index.ts",
   "scripts": {

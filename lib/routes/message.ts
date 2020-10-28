@@ -2,6 +2,7 @@ import { Router } from 'express';
 import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
 import { verifySignature } from '../utils';
+import { Message } from '../models';
 
 import pkg from '../../package.json';
 
@@ -67,7 +68,7 @@ const proposal = (res: any, msg: any) => {
     });
   }
 }
-const vote = (res: any, msg: any) => {
+const vote = async (res: any, msg: any, ts: string) => {
   if (msg.type !== 'vote') {
     return null;
   }
@@ -91,6 +92,28 @@ const vote = (res: any, msg: any) => {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_VOTE_METADATA,
       error_description: 'incorect vote metadata'
+    });
+  }
+
+  const proposal = await Message.findOne({
+    where: {
+      token: msg.token,
+      author_ipfs_hash: msg.payload.proposal
+    }
+  });
+
+  if (!proposal) {
+    return res.status(400).json({
+      code: ErrorCodes.INCORRECT_PROPOSAL_FORMAT,
+      error_description: 'incorect vote proposal'
+    });
+  }
+  const payload = JSON.parse(proposal.payload);
+
+  if (Number(ts) > Number(payload.end) || Number(payload.start) > Number(ts)) {
+    return res.status(400).json({
+      code: ErrorCodes.INCORRECT_VOTE_FORMAT,
+      error_description: 'not in voting window'
     });
   }
 }
@@ -139,7 +162,7 @@ message.post('/message', async (req, res) => {
     const checked = verifySignature(
       body.sig.message,
       body.sig.publicKey,
-      body.sig.message
+      body.sig.signature
     );
 
     if (!checked) {
@@ -153,7 +176,9 @@ message.post('/message', async (req, res) => {
   }
 
   proposal(res, msg);
-  vote(res, msg);
+  await vote(res, msg, ts);
+
+  // const space = tokens[msg.token]; 
 
   res.status(201).json({
     msg
