@@ -25,8 +25,6 @@ spacesRouter.get('/:space/proposals', async (req, res) => {
     ],
   });
   const spaces = messages.map(message => {
-    const metadata = JSON.parse(message.metadata);
-
     return [message.id, {
       address: message.address,
       msg: {
@@ -37,8 +35,7 @@ spacesRouter.get('/:space/proposals', async (req, res) => {
         payload: JSON.parse(message.payload)
       },
       sig: message.sig,
-      authorIpfsHash: message.author_ipfs_hash,
-      relayerIpfsHash: metadata.relayer_ipfs_hash
+      authorIpfsHash: message.author_ipfs_hash
     }];
   })
 
@@ -58,7 +55,6 @@ spacesRouter.get('/:space/proposal/:id', async (req, res) => {
     ],
   });
   const spaces = messages.map(message => {
-    const metadata = JSON.parse(message.metadata);
     return [message.address, {
       address: message.address,
       msg: {
@@ -69,8 +65,7 @@ spacesRouter.get('/:space/proposal/:id', async (req, res) => {
         payload: JSON.parse(message.payload)
       },
       sig: message.sig,
-      authorIpfsHash: message.author_ipfs_hash,
-      relayerIpfsHash: metadata.relayer_ipfs_hash
+      authorIpfsHash: message.author_ipfs_hash
     }];
   })
 

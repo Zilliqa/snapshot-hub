@@ -25,9 +25,6 @@ export class Message extends Model<Message> {
   type!: string;
 
   @Column
-  sig!: string;
-
-  @Column
   space!: string;
 
   @Column
@@ -41,7 +38,7 @@ export class Message extends Model<Message> {
   payload!: string;
 
   @Column(DataType.JSON)
-  metadata!: string;
+  sig!: string;
 
   @CreatedAt
   @Column

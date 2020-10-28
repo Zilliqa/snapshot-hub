@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
-import { verifySignature } from '../utils';
+import { verifySignature, pinJson } from '../utils';
 import { Message } from '../models';
 
 import pkg from '../../package.json';
@@ -178,9 +178,48 @@ message.post('/message', async (req, res) => {
   proposal(res, msg);
   await vote(res, msg, ts);
 
-  // const space = tokens[msg.token]; 
-
-  res.status(201).json({
-    msg
+  const space = tokens[msg.token];
+  const authorIpfsRes = await pinJson({
+    address: body.address,
+    msg: body.msg,
+    sig: body.sig,
+    version: '2'
   });
+
+  if (msg.type === 'proposal') {
+    await Message.create({
+      space,
+      token: msg.token,
+      author_ipfs_hash: authorIpfsRes,
+      address: body.address,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      type: 'proposal',
+      payload: JSON.stringify(msg.payload),
+      sig: JSON.stringify(body.sig)
+    });
+  }
+
+  if (msg.type === 'vote') {
+    await Message.create({
+      space,
+      token: msg.token,
+      author_ipfs_hash: authorIpfsRes,
+      address: body.address,
+      version: msg.version,
+      timestamp: msg.timestamp,
+      type: 'vote',
+      payload: JSON.stringify(msg.payload),
+      sig: JSON.stringify(body.sig)
+    });
+  }
+
+  console.log(
+    `Address "${body.address}"\n`,
+    `Token "${msg.token}"\n`,
+    `Type "${msg.type}"\n`,
+    `IPFS hash "${authorIpfsRes}"`
+  );
+
+  return res.json({ ipfsHash: authorIpfsRes });
 });
