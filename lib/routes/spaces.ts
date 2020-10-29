@@ -47,12 +47,12 @@ spacesRouter.get('/:space/proposal/:id', async (req, res) => {
   const messages = await Message.findAll({
     where: {
       space,
-      author_ipfs_hash: id,
+      proposal_id: id,
       type: 'vote'
     },
     order: [
       ['timestamp', 'DESC']
-    ],
+    ]
   });
   const spaces = messages.map(message => {
     return [message.address, {

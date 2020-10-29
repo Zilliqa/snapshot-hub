@@ -8,7 +8,8 @@ import {
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
   database: 'movies',
-  storage: ':memory:'
+  storage: "storage.sql"
+  // storage: ':memory:'
 });
 
 sequelize.addModels([

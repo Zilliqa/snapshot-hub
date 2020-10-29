@@ -8,7 +8,6 @@ import {
   Unique
 } from 'sequelize-typescript';
 
-
 @Table
 export class Message extends Model<Message> {
 
@@ -36,6 +35,9 @@ export class Message extends Model<Message> {
 
   @Column(DataType.JSON)
   payload!: string;
+
+  @Column
+  proposal_id?: string;
 
   @Column(DataType.JSON)
   sig!: string;

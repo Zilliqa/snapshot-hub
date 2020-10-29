@@ -209,6 +209,7 @@ message.post('/message', async (req, res) => {
       version: msg.version,
       timestamp: msg.timestamp,
       type: 'vote',
+      proposal_id: msg.payload.proposal,
       payload: JSON.stringify(msg.payload),
       sig: JSON.stringify(body.sig)
     });
