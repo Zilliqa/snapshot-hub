@@ -4,6 +4,9 @@
   "description": "snapshot-hub is rest API for snapshot frontend",
   "main": "index.ts",
   "scripts": {
+    "db:migrate": "npx sequelize db:migrate",
+    "db:seed": "npx sequelize db:seed:all",
+    "db:create": "npx sequelize db:create",
     "start": "node --require ts-node/register index.ts"
   },
   "author": "Hicaru",
