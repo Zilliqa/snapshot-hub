@@ -12,7 +12,7 @@ npm install
 npm start
 ```
 
-###Environment variables.
+### Environment variables.
   * `PINATA_API_KEY` - API key of [pinata](https://pinata.cloud/).
   * `PINATA_SECRET_API_KEY` - SECRET key of [pinata](https://pinata.cloud/).
   * `NODE_ENV` - development, test, production
