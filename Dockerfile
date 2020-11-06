@@ -9,4 +9,4 @@ EXPOSE 3000
 
 ARG SCRIPT="start"
 ENV SCRIPT=${SCRIPT}
-ENTRYPOINT ["sh", "run.sh"]
+ENTRYPOINT ["bash", "run.sh"]

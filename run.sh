@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Environment is $DEPLOY_ENV"
 echo "run script $SCRIPT"
 echo "Callback: $CALLBACK"
