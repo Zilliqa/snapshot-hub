@@ -180,22 +180,21 @@ message.post('/message', async (req, res) => {
   await vote(res, msg, ts);
 
   const space = tokens[msg.token];
-  const authorIpfsRes = await pinJson({
-    address: body.address,
-    msg: body.msg,
-    sig: body.sig,
-    version: '2'
-  });
+  let authorIpfsRes: any | null = null;
 
   if (msg.type === 'proposal') {
     const balances = await getBalances(msg.token);
-    const balancesIpfsHash = await pinJson(balances);
-
+    authorIpfsRes = await pinJson({
+      balances,
+      address: body.address,
+      msg: body.msg,
+      sig: body.sig,
+      version: '2'
+    });
     await Message.create({
       space,
       token: msg.token,
       author_ipfs_hash: authorIpfsRes,
-      balances_ipfs_hash: balancesIpfsHash,
       address: body.address,
       version: msg.version,
       timestamp: msg.timestamp,
@@ -206,6 +205,12 @@ message.post('/message', async (req, res) => {
   }
 
   if (msg.type === 'vote') {
+    authorIpfsRes = await pinJson({
+      address: body.address,
+      msg: body.msg,
+      sig: body.sig,
+      version: '2'
+    });
     await Message.create({
       space,
       token: msg.token,

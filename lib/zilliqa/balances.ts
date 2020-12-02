@@ -1,9 +1,9 @@
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 import { fromBech32Address } from '@zilliqa-js/crypto';
 
-export async function getBalances(address: string) {
+export async function getBalances(token: string) {
   const { blockchain } = new Zilliqa('https://api.zilliqa.com');
-  const base16 = fromBech32Address(address);
+  const base16 = fromBech32Address(token);
   const field = 'balances';
   const res = await blockchain.getSmartContractSubState(
     base16,
@@ -18,5 +18,5 @@ export async function getBalances(address: string) {
     return res.result[field];
   }
 
-  return {};
+  return '0';
 }
