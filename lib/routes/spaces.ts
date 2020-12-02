@@ -35,6 +35,7 @@ spacesRouter.get('/:space/proposals', async (req, res) => {
         payload: JSON.parse(message.payload)
       },
       sig: message.sig,
+      balanceIpfsHash: message.balances_ipfs_hash,
       authorIpfsHash: message.author_ipfs_hash
     }];
   })
@@ -54,6 +55,7 @@ spacesRouter.get('/:space/proposal/:id', async (req, res) => {
       ['timestamp', 'DESC']
     ]
   });
+  console.log(JSON.stringify(messages, null, 4));
   const spaces = messages.map(message => {
     return [message.address, {
       address: message.address,

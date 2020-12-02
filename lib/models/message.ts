@@ -33,6 +33,10 @@ export class Message extends Model<Message> {
   @Column
   author_ipfs_hash!: string;
 
+  @Unique
+  @Column
+  balances_ipfs_hash!: string;
+
   @Column(DataType.JSON)
   payload!: string;
 
