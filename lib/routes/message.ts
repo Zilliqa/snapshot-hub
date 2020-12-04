@@ -23,7 +23,7 @@ const proposal = (res: any, msg: any) => {
   }
 
   if (
-    Object.keys(msg.payload).length !== 7 ||
+    Object.keys(msg.payload).length !== 8 ||
     !msg.payload.choices ||
     msg.payload.choices.length < 2 ||
     !msg.payload.snapshot ||
@@ -32,6 +32,16 @@ const proposal = (res: any, msg: any) => {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_PROPOSAL_FORMAT,
       error_description: 'incorect proposal format'
+    });
+  }
+
+  if (!msg.payload.quorum ||
+      Number(msg.payload.quorum) > 100 ||
+      Number(msg.payload.quorum) < 0
+  ) {
+    return res.status(400).json({
+      code: ErrorCodes.INCORRECT_QUORUM,
+      error_description: 'incorect quorum'
     });
   }
 

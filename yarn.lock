@@ -87,9 +87,9 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@snapshot-labs/snapshot-spaces@github:zilpay/snapshot-spaces#master":
+"@snapshot-labs/snapshot-spaces@github:Zilliqa/snapshot-spaces#master":
   version "0.1.0"
-  resolved "https://codeload.github.com/zilpay/snapshot-spaces/tar.gz/8b095d268d63a7ff331af78dcd808e5bca723567"
+  resolved "https://codeload.github.com/Zilliqa/snapshot-spaces/tar.gz/1e790568107fd2017747900f700572f4ee19d069"
 
 "@types/bip39@^2.4.0":
   version "2.4.2"
