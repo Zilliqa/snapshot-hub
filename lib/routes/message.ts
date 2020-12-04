@@ -23,7 +23,7 @@ const proposal = (res: any, msg: any) => {
   }
 
   if (
-    Object.keys(msg.payload).length !== 8 ||
+    Object.keys(msg.payload).length !== 9 ||
     !msg.payload.choices ||
     msg.payload.choices.length < 2 ||
     !msg.payload.snapshot ||
