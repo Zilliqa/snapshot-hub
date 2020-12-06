@@ -3,7 +3,7 @@ import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
 import { verifySignature, pinJson } from '../utils';
 import { Message } from '../models';
-import { getBalances } from '../zilliqa';
+import { getBalances, getTotalSupply } from '../zilliqa';
 
 import pkg from '../../package.json';
 
@@ -194,8 +194,10 @@ message.post('/message', async (req, res) => {
 
   if (msg.type === 'proposal') {
     const balances = await getBalances(msg.token);
+    const totalSupply = await getTotalSupply(msg.token);
     authorIpfsRes = await pinJson({
       balances,
+      totalSupply,
       address: body.address,
       msg: body.msg,
       sig: body.sig,
