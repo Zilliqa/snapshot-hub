@@ -13,6 +13,7 @@ import { ErrorCodes } from '../config';
 const _PROCENT = new BN(1);
 
 export const message = Router();
+const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
 
 const tokens = fromentries(
   Object.entries(spaces).map((space: any) => {
@@ -29,7 +30,7 @@ const proposal = (res: any, msg: any) => {
     Object.keys(msg.payload).length !== 9 ||
     !msg.payload.choices ||
     msg.payload.choices.length < 2 ||
-    !msg.payload.snapshot ||
+    isNaN(msg.payload.snapshot) ||
     !msg.payload.metadata
   ) {
     return res.status(400).json({
@@ -203,8 +204,16 @@ message.post('/message', async (req, res) => {
     const _totalSupply = new BN(totalSupply);
     const _n = _1000.mul(_PROCENT);
     const _min = _totalSupply.div(_n);
+    const _minGZIL = new BN('30000000000000000');
 
-    if (_balance.lt(_min)) {
+    if (msg.token == gZIL && _balance.lt(_minGZIL)) {
+      return res.status(400).json({
+        code: ErrorCodes.MIN_BALANCE_ERROR,
+        error_description: `Your balance below than 30 gZIL.`
+      });
+    }
+
+    if (_balance.lt(_min) && msg.token !== gZIL) {
       return res.status(400).json({
         code: ErrorCodes.MIN_BALANCE_ERROR,
         error_description: `Your balance below than 0.${_PROCENT}%.`
