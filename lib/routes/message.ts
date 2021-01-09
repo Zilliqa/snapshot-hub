@@ -209,7 +209,7 @@ message.post('/message', async (req, res) => {
     if (msg.token == gZIL && _balance.lt(_minGZIL)) {
       return res.status(400).json({
         code: ErrorCodes.MIN_BALANCE_ERROR,
-        error_description: `Your balance below than 30 gZIL.`
+        error_description: 'you require 30 $gZIL or more to submit a proposal.'
       });
     }
 
