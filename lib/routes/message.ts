@@ -152,7 +152,9 @@ message.post('/message', async (req, res) => {
     });
   }
 
-  if (!msg.timestamp) {
+  msg.timestamp = Number(msg.timestamp);
+
+  if (!msg.timestamp || isNaN(msg.timestamp) || msg.timestamp > (ts + 30)) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_DATA,
       error_description: 'wrong timestamp'
