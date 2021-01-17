@@ -152,7 +152,7 @@ message.post('/message', async (req, res) => {
     });
   }
 
-  if (!msg.timestamp || msg.timestamp > (ts + 30)) {
+  if (!msg.timestamp) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_DATA,
       error_description: 'wrong timestamp'
