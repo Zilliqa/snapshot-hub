@@ -5,8 +5,31 @@ import BN from 'bn.js';
 
 const { blockchain } = new Zilliqa('https://api.zilliqa.com');
 const zilswap = '0xBa11eB7bCc0a02e947ACF03Cc651Bfaf19C9EC00';
+const _100 = new BN(100);
+const _zero = new BN(0);
 
-export async function getPool(token: string) {
+export async function getDEXpools(token: string) {
+  const field = 'pools';
+  const res = await blockchain.getSmartContractSubState(
+    zilswap,
+    field,
+    [token]
+  );
+
+  if (res.error) {
+    throw new Error(res.error.message);
+  }
+
+  if (!res || !res.result || !res.result[field] || !res.result[field][token]) {
+    return new BN('0');
+  }
+
+  const [, tokenReserve] = res.result[field][token]['arguments'];
+
+  return new BN(tokenReserve);
+}
+
+export async function getDEXbalance(token: string) {
   const field = 'balances';
   const res = await blockchain.getSmartContractSubState(
     zilswap,
@@ -42,21 +65,38 @@ export async function getBalances(token: string) {
   }
 
   const balances = cloneDeep(res.result[field]);
-  let pool = {};
+  let poolAmount = new BN('0');
+  let contribution = new BN('0');
+  let zwapBalance = {}
 
   try {
-    pool = await getPool(String(base16).toLowerCase());
+    zwapBalance = await getDEXbalance(String(base16).toLowerCase());
+    contribution = await getDEXpools(String(base16).toLowerCase());
+
+    for (const iterator of Object.values(zwapBalance)) {
+      if (typeof iterator === 'string') {
+        const v = new BN(iterator);
+        poolAmount = poolAmount.add(v);
+      }
+    }
   } catch {
     //
   }
 
-  for (const key in balances) {
-    if (key in pool) {
-      const _poolBalance = new BN(pool[key]);
-      const _tokenBalance = new BN(balances[key]);
-      const _balance = _poolBalance.add(_tokenBalance);
+  for (const key in zwapBalance) {
+    if (key in balances) {
+      const userContributionbalance = new BN(zwapBalance[key]);
+      const contributionPercentage = userContributionbalance.mul(_100).div(poolAmount);
 
-      balances[key] = _balance.toString();
+      if (_zero.eq(contributionPercentage)) {
+        continue;
+      }
+
+      const devel = contributionPercentage.mul(_100);
+      const userValue = contribution.div(devel);
+      const currentBalance = new BN(balances[key]);
+  
+      balances[key] = currentBalance.add(userValue).toString();
     }
   }
 
