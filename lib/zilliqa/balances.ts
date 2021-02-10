@@ -92,8 +92,7 @@ export async function getBalances(token: string) {
         continue;
       }
 
-      const devel = contributionPercentage.mul(_100);
-      const userValue = contribution.div(devel);
+      const userValue = contribution.mul(contributionPercentage).div(_100);
       const currentBalance = new BN(balances[key]);
   
       balances[key] = currentBalance.add(userValue).toString();
