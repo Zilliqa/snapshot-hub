@@ -200,28 +200,8 @@ message.post('/message', async (req, res) => {
   let authorIpfsRes: any | null = null;
 
   if (msg.type === 'proposal') {
-    const createrBalance = await getBalance(msg.token, body.address);
     const totalSupply = await getTotalSupply(msg.token);
-    const _balance = new BN(createrBalance);
-    const _1000 = new BN(1000);
-    const _totalSupply = new BN(totalSupply);
-    const _n = _1000.mul(_PROCENT);
-    const _min = _totalSupply.div(_n);
-    const _minGZIL = new BN('30000000000000000');
 
-    if (msg.token == gZIL && _balance.lt(_minGZIL)) {
-      // return res.status(400).json({
-      //   code: ErrorCodes.MIN_BALANCE_ERROR,
-      //   error_description: 'you require 30 $gZIL or more to submit a proposal.'
-      // });
-    }
-
-    if (_balance.lt(_min) && msg.token !== gZIL) {
-      // return res.status(400).json({
-      //   code: ErrorCodes.MIN_BALANCE_ERROR,
-      //   error_description: `Your balance below than 0.${_PROCENT}%.`
-      // });
-    }
     const balances = await getBalances(msg.token);
     authorIpfsRes = await pinJson({
       balances,
