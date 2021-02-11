@@ -1,14 +1,19 @@
 import { Router } from 'express';
+import BN from 'bn.js';
 import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
 import { verifySignature, pinJson } from '../utils';
 import { Message } from '../models';
+import { getBalances, getTotalSupply, getBalance } from '../zilliqa';
 
 import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
 
+const _PROCENT = new BN(1);
+
 export const message = Router();
+const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
 
 const tokens = fromentries(
   Object.entries(spaces).map((space: any) => {
@@ -22,15 +27,25 @@ const proposal = (res: any, msg: any) => {
   }
 
   if (
-    Object.keys(msg.payload).length !== 7 ||
+    Object.keys(msg.payload).length !== 9 ||
     !msg.payload.choices ||
     msg.payload.choices.length < 2 ||
-    !msg.payload.snapshot ||
+    isNaN(msg.payload.snapshot) ||
     !msg.payload.metadata
   ) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_PROPOSAL_FORMAT,
       error_description: 'incorect proposal format'
+    });
+  }
+
+  if (!msg.payload.quorum ||
+      Number(msg.payload.quorum) > 100 ||
+      Number(msg.payload.quorum) < 0
+  ) {
+    return res.status(400).json({
+      code: ErrorCodes.INCORRECT_QUORUM,
+      error_description: 'incorect quorum'
     });
   }
 
@@ -137,7 +152,9 @@ message.post('/message', async (req, res) => {
     });
   }
 
-  if (!msg.timestamp || msg.timestamp > (ts + 30)) {
+  msg.timestamp = Number(msg.timestamp);
+
+  if (!msg.timestamp || isNaN(msg.timestamp) || msg.timestamp > (ts + 30)) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_DATA,
       error_description: 'wrong timestamp'
@@ -162,7 +179,8 @@ message.post('/message', async (req, res) => {
     const checked = verifySignature(
       body.sig.message,
       body.sig.publicKey,
-      body.sig.signature
+      body.sig.signature,
+      body.address
     );
 
     if (!checked) {
@@ -179,14 +197,36 @@ message.post('/message', async (req, res) => {
   await vote(res, msg, ts);
 
   const space = tokens[msg.token];
-  const authorIpfsRes = await pinJson({
-    address: body.address,
-    msg: body.msg,
-    sig: body.sig,
-    version: '2'
-  });
+  let authorIpfsRes: any | null = null;
 
   if (msg.type === 'proposal') {
+    const createrBalance = await getBalance(msg.token, body.address);
+    const totalSupply = await getTotalSupply(msg.token);
+    const _balance = new BN(createrBalance);
+    const _1000 = new BN(1000);
+    const _totalSupply = new BN(totalSupply);
+    const _n = _1000.mul(_PROCENT);
+    const _min = _totalSupply.div(_n);
+    const _minGZIL = new BN('30000000000000000');
+
+    if (msg.token == gZIL && _balance.lt(_minGZIL)) {
+      return res.status(400).json({
+        code: ErrorCodes.MIN_BALANCE_ERROR,
+        error_description: 'you require 30 $gZIL or more to submit a proposal.'
+      });
+    }
+
+    if (_balance.lt(_min) && msg.token !== gZIL) {
+    }
+    const balances = await getBalances(msg.token);
+    authorIpfsRes = await pinJson({
+      balances,
+      totalSupply,
+      address: body.address,
+      msg: body.msg,
+      sig: body.sig,
+      version: '2'
+    });
     await Message.create({
       space,
       token: msg.token,
@@ -201,6 +241,12 @@ message.post('/message', async (req, res) => {
   }
 
   if (msg.type === 'vote') {
+    authorIpfsRes = await pinJson({
+      address: body.address,
+      msg: body.msg,
+      sig: body.sig,
+      version: '2'
+    });
     await Message.create({
       space,
       token: msg.token,

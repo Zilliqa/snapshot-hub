@@ -12,9 +12,9 @@ export async function pinJson(body: object) {
   const result = await pinata.pinJSONToIPFS(body);
   ipfsHash = result.IpfsHash;
 
-  fetch(`https://ipfs2arweave.com/permapin/${ipfsHash}`)
+  fetch(`https://gateway.pinata.cloud/ipfs/${ipfsHash}`)
     .then(res => res.json())
-    .then(json => console.log('Arweave success', json))
+    .then(json => console.log('Arweave success', ipfsHash))
     .catch(e => console.error('Arweave error', e));
 
   return ipfsHash;
