@@ -138,11 +138,6 @@ message.post('/message', async (req, res) => {
   const msg = JSON.parse(body.msg);
   const ts = (Date.now() / 1e3).toFixed();
 
-  return res.status(400).json({
-    code: ErrorCodes.INCORRECT_DATA,
-    error_description: 'incorect message body'
-  });
-
   if (!body || !body.address || !body.msg || !body.sig) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_DATA,
