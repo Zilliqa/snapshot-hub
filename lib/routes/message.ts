@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import BN from 'bn.js';
+// import BN from 'bn.js';
 import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
 import { verifySignature, pinJson } from '../utils';
 import { Message } from '../models';
-import { getBalances, getTotalSupply, getBalance } from '../zilliqa';
+import { getBalances, getTotalSupply } from '../zilliqa';
 
 import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
 
-const _PROCENT = new BN(1);
+// const _PROCENT = new BN(1);
 
 export const message = Router();
-const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
+// const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
 
 const tokens = fromentries(
   Object.entries(spaces).map((space: any) => {
