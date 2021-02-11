@@ -138,6 +138,11 @@ message.post('/message', async (req, res) => {
   const msg = JSON.parse(body.msg);
   const ts = (Date.now() / 1e3).toFixed();
 
+  return res.status(400).json({
+    code: ErrorCodes.INCORRECT_DATA,
+    error_description: 'incorect message body'
+  });
+
   if (!body || !body.address || !body.msg || !body.sig) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_DATA,
@@ -217,6 +222,10 @@ message.post('/message', async (req, res) => {
     }
 
     if (_balance.lt(_min) && msg.token !== gZIL) {
+      // return res.status(400).json({
+      //   code: ErrorCodes.MIN_BALANCE_ERROR,
+      //   error_description: `Your balance below than 0.${_PROCENT}%.`
+      // });
     }
     const balances = await getBalances(msg.token);
     authorIpfsRes = await pinJson({
