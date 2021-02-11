@@ -179,7 +179,8 @@ message.post('/message', async (req, res) => {
     const checked = verifySignature(
       body.sig.message,
       body.sig.publicKey,
-      body.sig.signature
+      body.sig.signature,
+      body.address
     );
 
     if (!checked) {
