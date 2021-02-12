@@ -219,7 +219,7 @@ message.post('/message', async (req, res) => {
     if (_balance.lt(_min) && msg.token !== gZIL) {
       return res.status(400).json({
         code: ErrorCodes.MIN_BALANCE_ERROR,
-        error_description: `Your balance below than 0.${_PROCENT}%.`
+        error_description: `Your token balance is below the requirement.`
       });
     }
     const balances = await getBalances(msg.token);
