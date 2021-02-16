@@ -10,8 +10,6 @@ import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
 
-const _PROCENT = new BN(1);
-
 export const message = Router();
 const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
 
@@ -203,10 +201,6 @@ message.post('/message', async (req, res) => {
     const createrBalance = await getBalance(msg.token, body.address);
     const totalSupply = await getTotalSupply(msg.token);
     const _balance = new BN(createrBalance);
-    const _1000 = new BN(1000);
-    const _totalSupply = new BN(totalSupply);
-    const _n = _1000.mul(_PROCENT);
-    const _min = _totalSupply.div(_n);
     const _minGZIL = new BN('30000000000000000');
 
     if (msg.token == gZIL && _balance.lt(_minGZIL)) {
