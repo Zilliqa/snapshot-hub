@@ -212,16 +212,10 @@ message.post('/message', async (req, res) => {
     if (msg.token == gZIL && _balance.lt(_minGZIL)) {
       return res.status(400).json({
         code: ErrorCodes.MIN_BALANCE_ERROR,
-        error_description: 'you require 30 $gZIL or more to submit a proposal.'
+        error_description: 'You require 30 $gZIL or more to submit a proposal.'
       });
     }
 
-    if (_balance.lt(_min) && msg.token !== gZIL) {
-      return res.status(400).json({
-        code: ErrorCodes.MIN_BALANCE_ERROR,
-        error_description: `Your token balance is below the requirement.`
-      });
-    }
     const balances = await getBalances(msg.token);
     authorIpfsRes = await pinJson({
       balances,
