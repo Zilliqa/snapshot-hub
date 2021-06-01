@@ -35,7 +35,7 @@ $ docker-compose up -d # runing.
 ## Snapshot Spaces Commit
 https://github.com/Zilliqa/snapshot-spaces/commit/238e87aad231351a51727b06208ab407f0de1dcc
 
-20210514
+20210601
 
 
 
