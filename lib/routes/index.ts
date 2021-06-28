@@ -9,7 +9,7 @@ import pkg from '../../package.json';
 const ENV = process.env.NODE_ENV || 'development';
 
 const router = Router();
-const dev = ENV === 'development';
+const dev = ENV === 'development' || ENV === 'test';
 let network = 'mainnet';
 
 if (dev) {
