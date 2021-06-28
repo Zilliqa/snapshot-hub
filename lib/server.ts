@@ -1,6 +1,3 @@
-import env from 'dotenv';
-env.config();
-
 import { createServer } from 'http';
 import { app } from './app';
 import { sequelizeRun } from './sequelize';

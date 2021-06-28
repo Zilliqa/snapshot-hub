@@ -15,7 +15,7 @@
     "@pinata/sdk": "^1.1.11",
     "@snapshot-labs/snapshot-spaces": "github:Zilliqa/snapshot-spaces#master",
     "@types/bluebird": "^3.5.32",
-    "@zilliqa-js/zilliqa": "^1.0.0",
+    "@zilliqa-js/zilliqa": " ^3.0.0",
     "bignumber.js": "^9.0.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
@@ -31,7 +31,7 @@
     "require-context": "^1.1.0",
     "sequelize": "^5.12.2",
     "sequelize-typescript": "^1.1.0",
-    "sqlite3": "^5.0.0",
+    "sqlite3": "^5.0.2",
     "strong-error-handler": "^4.0.0"
   },
   "devDependencies": {

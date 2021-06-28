@@ -38,8 +38,7 @@ const proposal = (res: any, msg: any) => {
   }
 
   if (!msg.payload.quorum ||
-      Number(msg.payload.quorum) > 100 ||
-      Number(msg.payload.quorum) < 0
+      Number(msg.payload.quorum) > 100
   ) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_QUORUM,

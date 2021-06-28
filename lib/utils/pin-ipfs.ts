@@ -2,8 +2,8 @@ import fetch from 'node-fetch';
 import pinataSDK from '@pinata/sdk';
 
 const pinata = pinataSDK(
-  process.env.PINATA_API_KEY,
-  process.env.PINATA_SECRET_API_KEY
+  String(process.env.PINATA_API_KEY),
+  String(process.env.PINATA_SECRET_API_KEY)
 );
 
 export async function pinJson(body: object) {
