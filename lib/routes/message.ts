@@ -4,14 +4,16 @@ import fromentries from 'object.fromentries';
 import spaces from '@snapshot-labs/snapshot-spaces';
 import { verifySignature, pinJson } from '../utils';
 import { Message } from '../models';
-import { getBalances, getTotalSupply, getBalance } from '../zilliqa';
+import { blockchain } from '../zilliqa/custom-fetch';
 
 import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
+import { fromBech32Address } from '@zilliqa-js/zilliqa';
 
 export const message = Router();
 const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
+const blk = new blockchain();
 
 const tokens = fromentries(
   Object.entries(spaces).map((space: any) => {
@@ -197,8 +199,15 @@ message.post('/message', async (req, res) => {
   let authorIpfsRes: any | null = null;
 
   if (msg.type === 'proposal') {
-    const createrBalance = await getBalance(msg.token, body.address);
-    const totalSupply = await getTotalSupply(msg.token);
+    const base16Token = fromBech32Address(msg.token);
+    const base16owner = fromBech32Address(msg.token);
+    const {
+      balances,
+      userBalance,
+      totalSupply
+    } = await blk.getLiquidity(base16Token, base16owner);
+
+    const createrBalance = userBalance;
     const _balance = new BN(createrBalance);
     const _minGZIL = new BN('30000000000000000');
 
@@ -209,7 +218,6 @@ message.post('/message', async (req, res) => {
       });
     }
 
-    const balances = await getBalances(msg.token);
     authorIpfsRes = await pinJson({
       balances,
       totalSupply,

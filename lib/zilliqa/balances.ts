@@ -5,7 +5,6 @@ import BN from 'bn.js';
 
 const { blockchain } = new Zilliqa('https://api.zilliqa.com');
 const zilswap = '0xBa11eB7bCc0a02e947ACF03Cc651Bfaf19C9EC00';
-const xcad = '0x1fb1a4fd7ba94b1617641d6022ba48cafa77eef0';
 const _100 = new BN(100000);
 const _zero = new BN(0);
 
