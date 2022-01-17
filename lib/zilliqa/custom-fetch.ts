@@ -91,9 +91,9 @@ export class blockchain {
     tokenBalances = this._parseZilSwap(res, token, tokenBalances);
     tokenBalances = this._parseXcad(res, token, tokenBalances);
 
-    console.log(tokenBalances[address]);
-
     const userBalance = tokenBalances[address];
+
+    console.log(userBalance);
 
     return {
       balances: tokenBalances,
@@ -192,4 +192,4 @@ export class blockchain {
   }
 }
 
-// new blockchain().getLiquidity('0xa845c1034cd077bd8d32be0447239c7e4be6cb21', '0x00ed57f2a16fd5ce11d6c372b6d13b95cd7a28e7');
+new blockchain().getLiquidity('0xa845c1034cd077bd8d32be0447239c7e4be6cb21', '0x837Eb6850BB3A1172Eb94B557762e474A8e9Ac73'.toLowerCase());
