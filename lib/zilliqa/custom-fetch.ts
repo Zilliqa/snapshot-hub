@@ -78,9 +78,8 @@ export class blockchain {
     ];
     const res = await this._send(batch);
     const [, tokenReserve] = res[0]['result'][poolFiled][token]['arguments'];
-    const zBalance = res[1]['result'][dexBalanceFiled];
+    const zBalance = res[1]['result'][dexBalanceFiled][token];
     const tokenBalances = res[4]['result'][tokenBalanceFiled];
-    const userBalance = tokenBalances[address];
     const totalSupply = res[5]['result'][totalSupplyFiled];
 
     let poolAmount = new BN('0');
@@ -109,6 +108,8 @@ export class blockchain {
       }
     }
 
+    const userBalance = tokenBalances[address];
+
     return {
       balances: tokenBalances,
       totalSupply,
@@ -131,5 +132,3 @@ export class blockchain {
     return res.json();
   }
 }
-
-new blockchain().getLiquidity('0xa845c1034cd077bd8d32be0447239c7e4be6cb21', '0x007744a9a6e150406db18c442269b0eb052444ad');
