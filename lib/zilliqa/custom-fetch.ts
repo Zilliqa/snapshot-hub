@@ -192,4 +192,4 @@ export class blockchain {
   }
 }
 
-new blockchain().getLiquidity('0xa845c1034cd077bd8d32be0447239c7e4be6cb21', '0x837Eb6850BB3A1172Eb94B557762e474A8e9Ac73'.toLowerCase());
+// new blockchain().getLiquidity('0xa845c1034cd077bd8d32be0447239c7e4be6cb21', '0x837Eb6850BB3A1172Eb94B557762e474A8e9Ac73'.toLowerCase());
