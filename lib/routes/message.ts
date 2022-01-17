@@ -200,8 +200,8 @@ message.post('/message', async (req, res) => {
   let authorIpfsRes: any | null = null;
 
   if (msg.type === 'proposal') {
-    const base16Token = fromBech32Address(msg.token);
-    const base16owner = fromBech32Address(msg.token);
+    const base16Token = fromBech32Address(msg.token).toLowerCase();
+    const base16owner = String(msg.address).toLowerCase();
     const {
       balances,
       userBalance,
