@@ -9,7 +9,7 @@ import { blockchain } from '../zilliqa/custom-fetch';
 import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
-import { fromBech32Address } from '@zilliqa-js/zilliqa';
+import { fromBech32Address, validation } from '@zilliqa-js/zilliqa';
 
 export const message = Router();
 const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
@@ -174,7 +174,7 @@ message.post('/message', async (req, res) => {
         error_description: 'incorrect type'
       });
     }
-  
+
     try {
       const checked = verifySignature(
         body.sig.message,
@@ -201,14 +201,13 @@ message.post('/message', async (req, res) => {
   
     if (msg.type === 'proposal') {
       const base16Token = fromBech32Address(msg.token).toLowerCase();
-      const base16owner = String(msg.address).toLowerCase();
+      const base16owner = validation.isBech32(body.address) ?
+        fromBech32Address(body.address) : String(body.address).toLowerCase();
       const {
         balances,
         userBalance,
         totalSupply
       } = await blk.getLiquidity(base16Token, base16owner);
-  
-      console.log(userBalance, totalSupply);
   
       const _balance = new BN(userBalance);
       const _minGZIL = new BN('30000000000000000');

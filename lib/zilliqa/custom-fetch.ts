@@ -93,8 +93,6 @@ export class blockchain {
 
     const userBalance = tokenBalances[address];
 
-    console.log(userBalance);
-
     return {
       balances: tokenBalances,
       totalSupply,
