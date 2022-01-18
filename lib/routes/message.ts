@@ -9,7 +9,7 @@ import { blockchain } from '../zilliqa/custom-fetch';
 import pkg from '../../package.json';
 
 import { ErrorCodes } from '../config';
-import { fromBech32Address, validation } from '@zilliqa-js/zilliqa';
+import { fromBech32Address } from '@zilliqa-js/zilliqa';
 
 export const message = Router();
 const gZIL = 'zil14pzuzq6v6pmmmrfjhczywguu0e97djepxt8g3e';
@@ -132,141 +132,148 @@ const vote = async (res: any, msg: any, ts: string) => {
   }
 }
 
-
 message.post('/message', async (req, res) => {
-  const body = req.body;
-  const msg = JSON.parse(body.msg);
-  const ts = (Date.now() / 1e3).toFixed();
-
-  if (!body || !body.address || !body.msg || !body.sig) {
-    return res.status(400).json({
-      code: ErrorCodes.INCORRECT_DATA,
-      error_description: 'incorect message body'
-    });
-  }
-
-  if (!tokens[msg.token]) {
-    return res.status(400).json({
-      code: ErrorCodes.UNKNOWN_SPACE,
-      error_description: 'unknown space'
-    });
-  }
-
-  msg.timestamp = Number(msg.timestamp);
-
-  if (!msg.timestamp || isNaN(msg.timestamp) || msg.timestamp > (ts + 30)) {
-    return res.status(400).json({
-      code: ErrorCodes.INCORRECT_DATA,
-      error_description: 'wrong timestamp'
-    });
-  }
-
-  if (!msg.version || msg.version !== pkg.version) {
-    return res.status(400).json({
-      code: ErrorCodes.INCORRECT_VER,
-      error_description: 'incorrect version'
-    });
-  }
-
-  if (!msg.type || !['proposal', 'vote'].includes(msg.type)) {
-    return res.status(400).json({
-      code: ErrorCodes.INCORRECT_TYPE,
-      error_description: 'incorrect type'
-    });
-  }
-
   try {
-    const checked = verifySignature(
-      body.sig.message,
-      body.sig.publicKey,
-      body.sig.signature,
-      body.address
-    );
-
-    if (!checked) {
-      throw new Error();
-    }
-  } catch (err) {
-    return res.status(400).json({
-      code: ErrorCodes.INCORRECT_SIGNATURE,
-      error_description: 'incorrect signature'
-    });
-  }
-
-  proposal(res, msg);
-  await vote(res, msg, ts);
-
-  const space = tokens[msg.token];
-  let authorIpfsRes: any | null = null;
-
-  if (msg.type === 'proposal') {
-    const base16Token = fromBech32Address(msg.token).toLowerCase();
-    const base16owner = validation.isBech32(msg.address)
-      ? fromBech32Address(msg.token).toLowerCase() : String(msg.address).toLowerCase();
-    const {
-      balances,
-      userBalance,
-      totalSupply
-    } = await blk.getLiquidity(base16Token, base16owner);
-
-    const _balance = new BN(userBalance);
-    const _minGZIL = new BN('30000000000000000');
-
-    if (msg.token == gZIL && _balance.lt(_minGZIL)) {
+    const body = req.body;
+    const msg = JSON.parse(body.msg);
+    const ts = (Date.now() / 1e3).toFixed();
+  
+    if (!body || !body.address || !body.msg || !body.sig) {
       return res.status(400).json({
-        code: ErrorCodes.MIN_BALANCE_ERROR,
-        error_description: 'You require 30 $gZIL or more to submit a proposal.'
+        code: ErrorCodes.INCORRECT_DATA,
+        error_description: 'incorect message body'
+      });
+    }
+  
+    if (!tokens[msg.token]) {
+      return res.status(400).json({
+        code: ErrorCodes.UNKNOWN_SPACE,
+        error_description: 'unknown space'
+      });
+    }
+  
+    msg.timestamp = Number(msg.timestamp);
+  
+    if (!msg.timestamp || isNaN(msg.timestamp) || msg.timestamp > (ts + 30)) {
+      return res.status(400).json({
+        code: ErrorCodes.INCORRECT_DATA,
+        error_description: 'wrong timestamp'
+      });
+    }
+  
+    if (!msg.version || msg.version !== pkg.version) {
+      return res.status(400).json({
+        code: ErrorCodes.INCORRECT_VER,
+        error_description: 'incorrect version'
+      });
+    }
+  
+    if (!msg.type || !['proposal', 'vote'].includes(msg.type)) {
+      return res.status(400).json({
+        code: ErrorCodes.INCORRECT_TYPE,
+        error_description: 'incorrect type'
+      });
+    }
+  
+    try {
+      const checked = verifySignature(
+        body.sig.message,
+        body.sig.publicKey,
+        body.sig.signature,
+        body.address
+      );
+  
+      if (!checked) {
+        throw new Error();
+      }
+    } catch (err) {
+      return res.status(400).json({
+        code: ErrorCodes.INCORRECT_SIGNATURE,
+        error_description: 'incorrect signature'
+      });
+    }
+  
+    proposal(res, msg);
+    await vote(res, msg, ts);
+  
+    const space = tokens[msg.token];
+    let authorIpfsRes: any | null = null;
+  
+    if (msg.type === 'proposal') {
+      const base16Token = fromBech32Address(msg.token).toLowerCase();
+      const base16owner = String(msg.address).toLowerCase();
+      const {
+        balances,
+        userBalance,
+        totalSupply
+      } = await blk.getLiquidity(base16Token, base16owner);
+  
+      console.log(userBalance, totalSupply);
+  
+      const _balance = new BN(userBalance);
+      const _minGZIL = new BN('30000000000000000');
+  
+      if (msg.token == gZIL && _balance.lt(_minGZIL)) {
+        return res.status(400).json({
+          code: ErrorCodes.MIN_BALANCE_ERROR,
+          error_description: 'You require 30 $gZIL or more to submit a proposal.'
+        });
+      }
+  
+      authorIpfsRes = await pinJson({
+        balances,
+        totalSupply,
+        address: body.address,
+        msg: body.msg,
+        sig: body.sig,
+        version: '2'
+      });
+      await Message.create({
+        space,
+        token: msg.token,
+        author_ipfs_hash: authorIpfsRes,
+        address: body.address,
+        version: msg.version,
+        timestamp: msg.timestamp,
+        type: 'proposal',
+        payload: JSON.stringify(msg.payload),
+        sig: JSON.stringify(body.sig)
+      });
+    }
+  
+    if (msg.type === 'vote') {
+      authorIpfsRes = await pinJson({
+        address: body.address,
+        msg: body.msg,
+        sig: body.sig,
+        version: '2'
+      });
+      await Message.create({
+        space,
+        token: msg.token,
+        author_ipfs_hash: authorIpfsRes,
+        address: body.address,
+        version: msg.version,
+        timestamp: msg.timestamp,
+        type: 'vote',
+        proposal_id: msg.payload.proposal,
+        payload: JSON.stringify(msg.payload),
+        sig: JSON.stringify(body.sig)
       });
     }
 
-    authorIpfsRes = await pinJson({
-      balances,
-      totalSupply,
-      address: body.address,
-      msg: body.msg,
-      sig: body.sig,
-      version: '2'
-    });
-    await Message.create({
-      space,
-      token: msg.token,
-      author_ipfs_hash: authorIpfsRes,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      type: 'proposal',
-      payload: JSON.stringify(msg.payload),
-      sig: JSON.stringify(body.sig)
+    console.log(
+      `Address "${body.address}"\n`,
+      `Token "${msg.token}"\n`,
+      `Type "${msg.type}"\n`,
+      `IPFS hash "${authorIpfsRes}"`
+    );
+  
+    return res.json({ ipfsHash: authorIpfsRes });
+  } catch (err) {
+    return res.status(400).json({
+      code: 500,
+      error_description: err.message
     });
   }
-
-  if (msg.type === 'vote') {
-    authorIpfsRes = await pinJson({
-      address: body.address,
-      msg: body.msg,
-      sig: body.sig,
-      version: '2'
-    });
-    await Message.create({
-      space,
-      token: msg.token,
-      author_ipfs_hash: authorIpfsRes,
-      address: body.address,
-      version: msg.version,
-      timestamp: msg.timestamp,
-      type: 'vote',
-      proposal_id: msg.payload.proposal,
-      payload: JSON.stringify(msg.payload),
-      sig: JSON.stringify(body.sig)
-    });
-  }
-
-  console.log(
-    `Address "${body.address}"\n`,
-    `Token "${msg.token}"\n`,
-    `Type "${msg.type}"\n`,
-    `IPFS hash "${authorIpfsRes}"`
-  );
-
-  return res.json({ ipfsHash: authorIpfsRes });
 });
