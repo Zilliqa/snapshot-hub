@@ -30,12 +30,21 @@ const proposal = (res: any, msg: any) => {
     Object.keys(msg.payload).length !== 9 ||
     !msg.payload.choices ||
     msg.payload.choices.length < 2 ||
-    isNaN(msg.payload.snapshot) ||
     !msg.payload.metadata
   ) {
     return res.status(400).json({
       code: ErrorCodes.INCORRECT_PROPOSAL_FORMAT,
       error_description: 'incorect proposal format'
+    });
+  }
+
+  if (
+    isNaN(msg.payload.snapshot) ||
+    Number(msg.payload.snapshot) === 0
+  ) {
+    return res.status(400).json({
+      code: ErrorCodes.INCORRECT_PROPOSAL_FORMAT,
+      error_description: 'incorect snapshot blocknumber'
     });
   }
 
